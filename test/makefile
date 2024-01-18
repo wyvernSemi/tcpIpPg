@@ -16,7 +16,7 @@ TCPCODE            = tcpIpPg.cpp
 
 # Set up Variables for tools
 MAKE_EXE           = make
-VSIMEXE            = ${MODEL_TECH}\\vsim
+VSIMEXE            = ${MODEL_TECH}/vsim
 VSIMARGS           =
 
 # VProc location, relative to this directory
