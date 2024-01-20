@@ -1,7 +1,23 @@
 ###################################################################
 # Makefile for TCP/IPv4 packet generator (tcp_ip_pg) test bench
+# for ModelSim
 #
-# Copyright (c) 2021 Simon Southwell
+# Copyright (c) 2021-2024 Simon Southwell.
+#
+# This file is part of TcpIpPg.
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# The file is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this file. If not, see <http://www.gnu.org/licenses/>.
 #
 ###################################################################
 
@@ -68,15 +84,13 @@ waves:
 
 gui: rungui
 
-sim: run
-
 log: runlog
 
 help:
 	@echo "make help          Display this message"
 	@echo "make               Build C/C++ code without running simulation"
 	@echo "make compile       Build HDL code without running simulation"
-	@echo "make run/sim       Build and run batch simulation"
+	@echo "make run           Build and run batch simulation"
 	@echo "make rungui/gui    Build and run GUI simulation"
 	@echo "make runlog/log    Build and run batch simulation with signal logging"
 	@echo "make waves         Run wave view in free starter ModelSim (to view runlog signals)"
@@ -88,7 +102,7 @@ help:
 
 clean:
 	@${MAKE_EXE} -C ${VPROCDIR} USER_C="${USERCODE}" TESTDIR="${CURDIR}" clean
-	@rm -rf "wlf*"
-	@rm -rf "work"
+	@rm -rf *wlf*
+	@rm -rf work
 	@vsim -c -do cleanvlib.do -do quit
 	@rm -rf transcript
