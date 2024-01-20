@@ -125,7 +125,7 @@ public:
                                         mac_addr(macAddrIn),
                                         tcp_port(tcpPortIn)
     {
-        usrRxCbFunc                    = null;
+        usrRxCbFunc                    = NULL;
     };
 
     // --------------------------------------------

@@ -1,0 +1,122 @@
+###################################################################
+# Makefile for TCP/IPv4 packet generator (tcp_ip_pg) test bench
+#
+# Copyright (c) 2021-2024 Simon Southwell.
+#
+# This file is part of TcpIpPg.
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# The file is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this file. If not, see <http://www.gnu.org/licenses/>.
+#
+###################################################################
+
+USRFLAGS           =
+
+# User files to build, passed in to vproc makefile build
+USERCODE           = VUserMain0.cpp             \
+                     VUserMain1.cpp             \
+                     tcpTest0.cpp               \
+                     tcpTest1.cpp               \
+                     tcpConnect.cpp
+
+TCPCODE            = tcpIpPg.cpp
+
+# Set up Variables for tools
+MAKE_EXE           = make
+
+# VProc location, relative to this directory
+VPROCDIR           = ../../vproc
+
+VPROC_PLI          = ${CURDIR}/VProc.so
+VLOGFLAGS          = -I${VPROCDIR} -Ptb.VCD_DUMP=1
+VLOGDEBUGFLAGS     = ${VLOGFLAGS} -Ptb.DEBUG_STOP=1
+
+VLOGFILES          = ${VPROCDIR}/f_VProc.v      \
+                     ../verilog/tcp_ip_pg.v     \
+                     tb.v
+
+CFLAGS             = "-I${CURDIR}/../src" ${USRFLAGS}
+
+#------------------------------------------------------
+# BUILD RULES
+#------------------------------------------------------
+
+# Build is dependant on processing makefile in vproc and the Verilog
+all: vproc verilog
+
+# Call the vproc make file for it to determine if anything
+# needs building.
+.PHONY : vproc
+vproc:
+	@${MAKE_EXE} ${VPROC_PLI}                   \
+                 -C ${VPROCDIR}                 \
+                 -f makefile.ica                \
+                 USRFLAGS=${CFLAGS}             \
+                 USRCDIR=${CURDIR}/src          \
+                 USER_C="${USERCODE}"           \
+                 MEM_C="${TCPCODE}"             \
+                 MEMMODELDIR="${CURDIR}/../src" \
+                 TESTDIR=${CURDIR}
+
+verilog: ${VLOGFILES}
+	@iverilog ${VLOGFLAGS} -o sim ${VLOGFILES}
+
+verilog_debug: ${VLOGFILES}
+	@iverilog ${VLOGDEBUGFLAGS} -o sim ${VLOGFILES}
+
+#------------------------------------------------------
+# EXECUTION RULES
+#------------------------------------------------------
+
+compile: verilog
+
+sim: all
+	@vvp -s -m ${VPROC_PLI} sim
+
+run: all
+	@vvp -n -m ${VPROC_PLI} sim
+
+debug: clean vproc verilog_debug
+	@vvp -m ${VPROC_PLI} sim
+
+rungui: all
+	@vvp -n -m ${VPROC_PLI} sim
+	@if [ -e waves.gtkw ]; then                 \
+	    gtkwave -A waves.vcd;                   \
+	else                                        \
+	    gtkwave waves.vcd;                      \
+	fi
+
+waves:
+	@gtkwave -A waves.vcd
+
+gui: rungui
+
+help:
+	@echo "make help          Display this message"
+	@echo "make               Build C/C++ code without running simulation"
+	@echo "make compile       Build HDL code without running simulation"
+	@echo "make run           Build and run batch simulation"
+	@echo "make sim           Build and run interactive session (sim not started)"
+	@echo "make debug         Build and run batch simulation, stopping for debugger attachment"
+	@echo "make rungui/gui    Build and run GUI simulation"
+	@echo "make waves         Run wave view in gtkwave"
+	@echo "make clean         clean previous build artefacts"
+
+#------------------------------------------------------
+# CLEANING RULES
+#------------------------------------------------------
+
+clean:
+	@${MAKE_EXE} -C ${VPROCDIR} -f makefile.ica USER_C="${USERCODE}" TESTDIR="${CURDIR}" clean
+	@rm -rf ${VPROC_PLI} sim *.vcd

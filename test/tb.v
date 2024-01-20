@@ -38,7 +38,10 @@
 
 module tb
 #(parameter GUI_RUN          = 0,
-  parameter CLK_FREQ_KHZ     = 156250)
+  parameter CLK_FREQ_KHZ     = 156250,
+  parameter VCD_DUMP         = 0,
+  parameter DEBUG_STOP       = 0
+  )
 ();
 
 
@@ -60,10 +63,24 @@ wire  [1:0]    halt;
 
 initial
 begin
+   if (VCD_DUMP != 0)
+   begin
+     $dumpfile("waves.vcd");
+     $dumpvars(0, tb);
+   end
+   
    clk                                 = 1'b1;
    count                               = -1;
    
    #0 // Ensure first x->1 clock edge is complete before initialisation
+   
+   if (DEBUG_STOP != 0)
+   begin
+     $display("\n***********************************************");
+     $display("* Stopping simulation for debugger attachment *");
+     $display("***********************************************\n");
+     $stop;
+   end
    
    // Generate a clock
    forever #(500000000/CLK_FREQ_KHZ) clk = ~clk;

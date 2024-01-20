@@ -517,7 +517,7 @@ uint32_t tcpIpPg::processFrame (uint32_t* rx_data, uint32_t rx_len)
     ridx                               += data_off_bytes - IPV4_MIN_HDR_LEN*4;
 
     // If all checks out, extract payload and call usr callback, if one registered
-    if (!error && usrRxCbFunc != null)
+    if (!error && usrRxCbFunc != NULL)
     {
         rxInfo.rx_len                  = ipv4_payload_len-data_off_bytes;
 
