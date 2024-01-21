@@ -35,13 +35,16 @@ TCPCODE            = tcpIpPg.cpp
 MAKE_EXE           = make
 
 # VProc location, relative to this directory
-VPROCDIR           = ../../vproc
+VPROC_TOP          = ../../vproc
+
+# Define the github repository URL for the VProc virtual processor 
+VPROC_REPO         = https://github.com/wyvernSemi/vproc.git
 
 VPROC_PLI          = ${CURDIR}/VProc.so
-VLOGFLAGS          = -I${VPROCDIR} -Ptb.VCD_DUMP=1
+VLOGFLAGS          = -I${VPROC_TOP} -Ptb.VCD_DUMP=1
 VLOGDEBUGFLAGS     = ${VLOGFLAGS} -Ptb.DEBUG_STOP=1
 
-VLOGFILES          = ${VPROCDIR}/f_VProc.v      \
+VLOGFILES          = ${VPROC_TOP}/f_VProc.v     \
                      ../verilog/tcp_ip_pg.v     \
                      tb.v
 
@@ -57,9 +60,10 @@ all: vproc verilog
 # Call the vproc make file for it to determine if anything
 # needs building.
 .PHONY : vproc
-vproc:
-	@${MAKE_EXE} ${VPROC_PLI}                   \
-                 -C ${VPROCDIR}                 \
+vproc: ${VPROC_TOP}
+	@${MAKE_EXE} --no-print-directory           \
+                 ${VPROC_PLI}                   \
+                 -C ${VPROC_TOP}                \
                  -f makefile.ica                \
                  USRFLAGS=${CFLAGS}             \
                  USRCDIR=${CURDIR}/src          \
@@ -67,6 +71,12 @@ vproc:
                  MEM_C="${TCPCODE}"             \
                  MEMMODELDIR="${CURDIR}/../src" \
                  TESTDIR=${CURDIR}
+
+#
+# Checkout VProc from github if it doesn't exist at the specified location
+#
+${VPROC_TOP}:
+	git clone ${VPROC_REPO} ${VPROC_TOP} --recursive
 
 verilog: ${VLOGFILES}
 	@iverilog ${VLOGFLAGS} -o sim ${VLOGFILES}
@@ -117,6 +127,6 @@ help:
 # CLEANING RULES
 #------------------------------------------------------
 
-clean:
-	@${MAKE_EXE} -C ${VPROCDIR} -f makefile.ica USER_C="${USERCODE}" TESTDIR="${CURDIR}" clean
+clean: ${VPROC_TOP}
+	@${MAKE_EXE} --no-print-directory -C ${VPROC_TOP} -f makefile.ica USER_C="${USERCODE}" TESTDIR="${CURDIR}" clean
 	@rm -rf ${VPROC_PLI} sim *.vcd
