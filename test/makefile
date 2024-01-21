@@ -21,11 +21,6 @@
 #
 ###################################################################
 
-#
-# Ensure that the MODEL_TECH environment variable has been setup and
-# points to the correct ModelSim location
-#
-
 # User files to build, passed in to vproc makefile build
 USERCODE           = VUserMain0.cpp VUserMain1.cpp tcpTest0.cpp tcpTest1.cpp tcpConnect.cpp
 TCPCODE            = tcpIpPg.cpp
@@ -36,9 +31,29 @@ VSIMEXE            = ${MODEL_TECH}/vsim
 VSIMARGS           =
 
 # VProc location, relative to this directory
-VPROCDIR           = ../../vproc
+VPROC_TOP          = ../../vproc
+
+# Define the github repository URL for the VProc virtual processor 
+VPROC_REPO         = https://github.com/wyvernSemi/vproc.git
 
 USRCFLAGS          = "-I${CURDIR}/../src"
+
+# Get OS type
+OSTYPE             =$(shell uname)
+
+# If run from a place where MODEL_TECH is not defined, construct from path to PLI library
+ifeq ("${MODEL_TECH}", "")
+  ifeq (${OSTYPE}, Linux)
+    PLILIB         = libmtipli.so
+  else
+    PLILIB         = mtipli.dll
+  endif
+  
+  VSIMPATH         = $(shell which vsim)
+  SIMROOT          = $(shell dirname ${VSIMPATH})/..
+  PLILIBPATH       = $(shell find ${SIMROOT} -name "${PLILIB}")
+  MODEL_TECH       = $(shell dirname ${PLILIBPATH})
+endif
 
 #------------------------------------------------------
 # BUILD RULES
@@ -50,9 +65,10 @@ all: vproc
 # Call the vproc make file for it to determine if anything
 # needs building.
 .PHONY : vproc
-vproc:
-	@${MAKE_EXE} ${CURDIR}/VProc.so             \
-                 -C ${VPROCDIR}                 \
+vproc: ${VPROC_TOP}
+	@${MAKE_EXE} --no-print-directory           \
+                 ${CURDIR}/VProc.so             \
+                 -C ${VPROC_TOP}                \
                  USRFLAGS=${USRCFLAGS}          \
                  USRCDIR=${CURDIR}/src          \
                  USER_C="${USERCODE}"           \
@@ -60,6 +76,12 @@ vproc:
                  MEMMODELDIR="${CURDIR}/../src" \
                  TESTDIR=${CURDIR}              \
                  MODELSIMDIR="${MODEL_TECH}\.."
+
+#
+# Checkout VProc from github if it doesn't exist at the specified location
+#
+${VPROC_TOP}:
+	git clone ${VPROC_REPO} ${VPROC_TOP} --recursive
 
 #------------------------------------------------------
 # EXECUTION RULES
@@ -100,8 +122,8 @@ help:
 # CLEANING RULES
 #------------------------------------------------------
 
-clean:
-	@${MAKE_EXE} -C ${VPROCDIR} USER_C="${USERCODE}" TESTDIR="${CURDIR}" clean
+clean: ${VPROC_TOP}
+	@${MAKE_EXE} --no-print-directory -C ${VPROC_TOP} USER_C="${USERCODE}" TESTDIR="${CURDIR}" clean
 	@rm -rf *wlf*
 	@rm -rf work
 	@vsim -c -do cleanvlib.do -do quit
