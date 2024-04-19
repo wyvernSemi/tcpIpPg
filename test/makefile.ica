@@ -63,7 +63,7 @@ all: vproc verilog
 vproc: ${VPROC_TOP}
 	@${MAKE_EXE} --no-print-directory           \
                  ${VPROC_PLI}                   \
-                 -C ${VPROC_TOP}                \
+                 -C ${VPROC_TOP}/test           \
                  -f makefile.ica                \
                  USRFLAGS=${CFLAGS}             \
                  USRCDIR=${CURDIR}/src          \
@@ -128,5 +128,5 @@ help:
 #------------------------------------------------------
 
 clean: ${VPROC_TOP}
-	@${MAKE_EXE} --no-print-directory -C ${VPROC_TOP} -f makefile.ica USER_C="${USERCODE}" TESTDIR="${CURDIR}" clean
+	@${MAKE_EXE} --no-print-directory -C ${VPROC_TOP}/test -f makefile.ica USER_C="${USERCODE}" TESTDIR="${CURDIR}" clean
 	@rm -rf ${VPROC_PLI} sim *.vcd

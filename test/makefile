@@ -68,7 +68,7 @@ all: vproc
 vproc: ${VPROC_TOP}
 	@${MAKE_EXE} --no-print-directory           \
                  ${CURDIR}/VProc.so             \
-                 -C ${VPROC_TOP}                \
+                 -C ${VPROC_TOP}/test           \
                  USRFLAGS=${USRCFLAGS}          \
                  USRCDIR=${CURDIR}/src          \
                  USER_C="${USERCODE}"           \
@@ -123,7 +123,7 @@ help:
 #------------------------------------------------------
 
 clean: ${VPROC_TOP}
-	@${MAKE_EXE} --no-print-directory -C ${VPROC_TOP} USER_C="${USERCODE}" TESTDIR="${CURDIR}" clean
+	@${MAKE_EXE} --no-print-directory -C ${VPROC_TOP}/test USER_C="${USERCODE}" TESTDIR="${CURDIR}" clean
 	@rm -rf *wlf*
 	@rm -rf work
 	@vsim -c -do cleanvlib.do -do quit
