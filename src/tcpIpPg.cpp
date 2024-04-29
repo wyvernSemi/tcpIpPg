@@ -295,7 +295,7 @@ uint32_t tcpIpPg::ethFrame(uint32_t* frame, uint32_t* payload, uint32_t payload_
     // Check that any payload can fit in an ethernet packet
     if (payload_len > 1500)
     {
-        printf("NODE%d: ethFrame() : ***ERROR. Specified payload length (%d) too big. Must be <= 1500\n");
+        printf("NODE%d: ethFrame() : ***ERROR. Specified payload length (%d) too big. Must be <= 1500\n", node, payload_len);
         return 0;
     }
 
@@ -389,12 +389,12 @@ uint32_t tcpIpPg::processFrame (uint32_t* rx_data, uint32_t rx_len)
 
     // Check that the MAC address is for us
     uint32_t ridx = 0;
-    uint64_t dst_mac_addr              = (uint64)rx_data[ridx++] << 40 |
-                                         (uint64)rx_data[ridx++] << 32 |
-                                         (uint64)rx_data[ridx++] << 24 |
-                                         (uint64)rx_data[ridx++] << 16 |
-                                         (uint64)rx_data[ridx++] <<  8 |
-                                         (uint64)rx_data[ridx++];
+    uint64_t dst_mac_addr              = (uint64_t)rx_data[ridx++] << 40 |
+                                         (uint64_t)rx_data[ridx++] << 32 |
+                                         (uint64_t)rx_data[ridx++] << 24 |
+                                         (uint64_t)rx_data[ridx++] << 16 |
+                                         (uint64_t)rx_data[ridx++] <<  8 |
+                                         (uint64_t)rx_data[ridx++];
 
     if (dst_mac_addr != mac_addr)
     {
@@ -404,12 +404,12 @@ uint32_t tcpIpPg::processFrame (uint32_t* rx_data, uint32_t rx_len)
     }
 
     // Extract SRC addr
-    rxInfo.mac_src_addr                = (uint64)rx_data[ridx++] << 40 |
-                                         (uint64)rx_data[ridx++] << 32 |
-                                         (uint64)rx_data[ridx++] << 24 |
-                                         (uint64)rx_data[ridx++] << 16 |
-                                         (uint64)rx_data[ridx++] <<  8 |
-                                         (uint64)rx_data[ridx++];
+    rxInfo.mac_src_addr                = (uint64_t)rx_data[ridx++] << 40 |
+                                         (uint64_t)rx_data[ridx++] << 32 |
+                                         (uint64_t)rx_data[ridx++] << 24 |
+                                         (uint64_t)rx_data[ridx++] << 16 |
+                                         (uint64_t)rx_data[ridx++] <<  8 |
+                                         (uint64_t)rx_data[ridx++];
 
     // -------------------------
     // IPV4
