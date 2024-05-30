@@ -16,7 +16,7 @@ An example test environment is provided, for ModelSim, with two packet generator
 The basic functionality provided is as listed below
 
 * A Verilog module tcp_ip_pg
-    *	Clock input, nominally 156.25MHz (10×109 ÷ 64)
+    *	Clock input, nominally 156.25MHz (10×10<sup>9</sup> ÷ 64)
     *	XGMII interface, with TX and RX data and control  ports
     *	A halt output for use in test bench control
 *	A class to generate a TCP/IPv4 packet into a buffer
