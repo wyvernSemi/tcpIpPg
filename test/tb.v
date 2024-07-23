@@ -31,11 +31,6 @@
 
 `timescale 1ps/1ps
 
-`define RESET_PERIOD    10
-`define TIMEOUT_COUNT   400000
-
-`define HALT_ADDR       32'hAFFFFFF0
-
 module tb
 #(parameter GUI_RUN          = 0,
   parameter CLK_FREQ_KHZ     = 156250,
@@ -44,10 +39,11 @@ module tb
   )
 ();
 
+localparam  RESET_PERIOD     = 10;
+localparam  TIMEOUT_COUNT    = 400000;
 
 // Clock, reset and simulation control state
 reg            clk;
-wire           reset_n;
 integer        count;
 
 wire [63:0]    txd;
@@ -83,11 +79,8 @@ begin
    end
    
    // Generate a clock
-   forever #(500000000/CLK_FREQ_KHZ) clk = ~clk;
+   forever #(500000000.0/CLK_FREQ_KHZ) clk = ~clk;
 end
-
-// Generate a reset signal using count
-assign reset_n                         = (count >= `RESET_PERIOD) ? 1'b1 : 1'b0;
 
 // -----------------------------------------------
 // Simulation control process
@@ -97,7 +90,7 @@ begin
   count                                <= count + 1;
 
   // Stop/finish the simulations of timeout or a halt signal
-  if (count == `TIMEOUT_COUNT || |halt == 1'b1)
+  if (count == TIMEOUT_COUNT || |halt == 1'b1)
   begin
     if (GUI_RUN == 0)
     begin

@@ -2,11 +2,14 @@
 do cleanvlib.do
 
 # Compile the code into the appropriate libraries
-do compile.do
+do compile_vhdl.do
 
-# Run the tests
-vsim -gGUI_RUN=1 -pli VProc.so -t 100ps -gui tb
+# Run the tests. 
+vsim -quiet -pli VProc.so -t 100ps tb
+do batch.do
 set StdArithNoWarnings   1
 set NumericStdNoWarnings 1
-do wave.do
 run -all
+
+#Exit the simulations
+quit

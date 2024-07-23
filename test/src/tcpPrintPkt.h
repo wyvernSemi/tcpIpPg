@@ -42,7 +42,7 @@ public:
         VPrint("Node%d: Source MAC Addr...........: ", nodenum);
         for (int idx = 0; idx < 6; idx++)
         {
-            VPrint("%02X", (rx_info.mac_src_addr >> 8*(5-idx)) & 0xff);
+            VPrint("%02lX", (unsigned long)((rx_info.mac_src_addr >> 8*(5-idx)) & 0xff));
             if (idx != 5)
                 VPrint("-");
             else

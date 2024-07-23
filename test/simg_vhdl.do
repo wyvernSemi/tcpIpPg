@@ -2,7 +2,7 @@
 do cleanvlib.do
 
 # Compile the code into the appropriate libraries
-do compile.do
+do compile_vhdl.do
 
 # Run the tests
 vsim -gGUI_RUN=1 -pli VProc.so -t 100ps -gui tb
