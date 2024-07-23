@@ -4,7 +4,7 @@
 The tcpIpPg project is a set of verification IP for generating and receiving 10GbE TCP/IPv4 Ethernet packets over an XGMII interface in a Verilog test environment. The generation environment is a set of C++ classes, to generate packets in to a buffer and then send that buffer over the Verilog XGMII interface. The connection between the Verilog and the C++ domain is done using the Virtual Processor, VProc (wyvernSemi/vproc)—a piece of VIP that allows C and C++ code, compiled for the local machine, to run and access the Verilog simulation environment, and VProc is freely available on github.
 
 <p align="center">
-<img src="https://github.com/wyvernSemi/tcpIpPg/assets/21970031/0fcfe84e-3a32-414e-bbf1-536266245f8d" width=600>
+<img src="https://github.com/wyvernSemi/tcpIpPg/assets/21970031/0fcfe84e-3a32-414e-bbf1-536266245f8d" width=700>
 </p>
 
 The intent for this packet generator is to allow ease of test vector generation when verifying 10G Ethernet logic IP, such as a MAC, and/or a server or client for TCP and IPv4 protocols. The bulk of the functionality is defined in the provided C++ classes, making it easily extensible to allow support for other protocols such as UDP and IPv6. It is also meant to allow exploration of how these protocols function, as an educational vehicle.
@@ -16,7 +16,7 @@ An example test environment is provided, for ModelSim, with two packet generator
 The basic functionality provided is as listed below
 
 * A Verilog module tcp_ip_pg
-    *	Clock input, nominally 156.25MHz (10×109 ÷ 64)
+    *	Clock input, nominally 156.25MHz (10×10<sup>9</sup> ÷ 64)
     *	XGMII interface, with TX and RX data and control  ports
     *	A halt output for use in test bench control
 *	A class to generate a TCP/IPv4 packet into a buffer
