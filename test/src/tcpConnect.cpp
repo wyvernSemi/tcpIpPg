@@ -247,12 +247,12 @@ int tcpConnect::initiateTermination(
 
     tcpIpPg::tcpConfig_t pktCfg;
 
-    // Send FIN+ACK packet
+    // Send FIN packet
 
     pktCfg.dst_port     = dst_port;
     pktCfg.seq_num      = seq_num;
     pktCfg.ack_num      = ack_num;
-    pktCfg.ack          = true;
+    pktCfg.ack          = false;
     pktCfg.rst_conn     = false;
     pktCfg.sync_seq     = false;
     pktCfg.finish       = true;
@@ -372,8 +372,9 @@ int tcpConnect::initiateTermination(
 
                 pTcp->TcpVpSendRawEthFrame(frmBuf, len);
 
-                // Send FIN+ACK
+                // Send FIN
                 pktCfg.seq_num;                        // FIN  increments sequence number
+                pktCfg.ack          = false;
                 pktCfg.finish       = true;
 
                 len = pTcp->genTcpIpPkt (pktCfg, frmBuf, NULL, 0);
