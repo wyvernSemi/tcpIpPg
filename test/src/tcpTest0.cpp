@@ -37,13 +37,15 @@ uint32_t tcpTest0::runTest()
     uint32_t frmBuf  [PKTBUFSIZE];
     tcpIpPg::tcpConfig_t pktCfg;
 
+    // Create a tcpIpPg object
     pTcp = new tcpIpPg(node, CLIENT_IPV4_ADDR, CLIENT_MAC_ADDR, TCP_PORT_NUM);
 
+    // Let the simulation run for a few ticks
     pTcp->TcpVpSendIdle(SMALL_PAUSE);
 
     // Register RX call back function
     pTcp->registerUsrRxCbFunc(rxCallback, (void*)this);
-    
+
     init_seq = SERVER_TCP_INIT_SEQ;
     init_ack = CLIENT_TCP_INIT_SEQ;
 
@@ -60,11 +62,11 @@ uint32_t tcpTest0::runTest()
     pTcp->TcpVpSendIdle(SMALL_PAUSE);
 
     // Send another packet with data...
-    
+
     // Generate a payload as a zero termentated string message.
     char sbuf[STRBUFSIZE];
     payloadLen = sprintf(sbuf, "*** Data Packet from node %d ***\n\n", node);
-    
+
     // Copy string bytes to payload buffer (not bytes)
     for (int idx = 0; idx < payloadLen; idx++)
     {
@@ -75,7 +77,7 @@ uint32_t tcpTest0::runTest()
     pktCfg.dst_port     = TCP_PORT_NUM;
     pktCfg.seq_num      = connLastPkt.tcp_ack_num;
     pktCfg.ack_num      = connLastPkt.tcp_seq_num +1;
-    pktCfg.ack          = true;
+    pktCfg.ack          = false;
     pktCfg.rst_conn     = false;
     pktCfg.sync_seq     = false;
     pktCfg.finish       = false;
@@ -88,7 +90,7 @@ uint32_t tcpTest0::runTest()
 
     // Transmit packet over node's bus
     pTcp->TcpVpSendRawEthFrame (frmBuf, len);
-    
+
     // Increment the sequence number
     pktCfg.seq_num += payloadLen;
 
@@ -101,13 +103,15 @@ uint32_t tcpTest0::runTest()
     // Copy the received packet, and delete from the queue
     connLastPkt = rxQueue.front();
     rxQueue.erase(rxQueue.begin());
-    
+
     // Check that an ACK received, and all packets acknowledged, then initiate termination
     // of connection.
     if ((connLastPkt.tcp_flags & ACK) && (connLastPkt.tcp_ack_num == pktCfg.seq_num))
     {
 
         pTcp->TcpVpSendIdle(SMALL_PAUSE);
+
+        printf("Terminating\n");
 
         int error = conn.initiateTermination(
                                node, pTcp,
@@ -118,12 +122,15 @@ uint32_t tcpTest0::runTest()
                                SERVER_MAC_ADDR,
                                pktCfg.seq_num,
                                connLastPkt.tcp_seq_num);
-                              
-        
+
+        if (error)
+        {
+            VPrint("***ERROR: bad status returned on termination (%d) at node %d\n", error, node);
+        }
+
     }
-    
+
     pTcp->TcpVpSendIdle(END_PAUSE);
-    
 
     return 0;
 }

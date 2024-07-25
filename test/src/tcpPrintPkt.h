@@ -35,11 +35,21 @@ public:
     tcpPrintPkt() {};
 
     // Method to print out formatted receive data
-    static void printRxPkt(tcpIpPg::rxInfo_t &rx_info, int nodenum, bool relative = false, uint32_t init_seq=0, uint32_t init_ack=0)
+    void printRxPkt(tcpIpPg::rxInfo_t &rx_info, int nodenum, bool relative = false, uint32_t init_seq=0, uint32_t init_ack=0)
     {
         const char* flags[9] = {" FIN", " SYN", " RST", " PSH", " ACK", "URG", " ECE", " CWR", " NS"};
 
-        VPrint("Node%d: Source MAC Addr...........: ", nodenum);
+#ifdef NEWPREFIX
+        sprintf(strbuf, "%s(%d)%s%s(%d)", (nodenum ? "client" : "server"),
+                                           nodenum ^ 1,
+                                           "=>",
+                                          (nodenum ? "server" : "client"),
+                                           nodenum);
+#else                                           
+        sprintf(strbuf, "Node%d", nodenum);
+#endif
+
+        VPrint("%s: Source MAC Addr...........: ", strbuf);
         for (int idx = 0; idx < 6; idx++)
         {
             VPrint("%02lX", (unsigned long)((rx_info.mac_src_addr >> 8*(5-idx)) & 0xff));
@@ -49,7 +59,7 @@ public:
                 VPrint("\n");
         }
 
-        VPrint("Node%d: Source IPv4 Addr..........: ", nodenum);
+        VPrint("%s: Source IPv4 Addr..........: ", strbuf);
         for (int idx = 0; idx < 4; idx++)
         {
             VPrint("%02d", (rx_info.ipv4_src_addr >> 8*(3-idx)) & 0xff);
@@ -59,25 +69,25 @@ public:
                 VPrint("\n");
         }
 
-        VPrint("Node%d: Source TCP port...........: 0x%04x\n", nodenum, rx_info.tcp_src_port);
+        VPrint("%s: Source TCP port...........: 0x%04x\n", strbuf, rx_info.tcp_src_port);
 
-        VPrint("Node%d: Source sequence#..........: 0x%08x", nodenum, rx_info.tcp_seq_num);
+        VPrint("%s: Source sequence#..........: 0x%08x", strbuf, rx_info.tcp_seq_num);
         if (relative)
         {
             VPrint(" (%4d relative)", rx_info.tcp_seq_num - init_seq);
         }
         VPrint("\n");
 
-        VPrint("Node%d: Source ACK#...............: 0x%08x", nodenum, rx_info.tcp_ack_num);
+        VPrint("%s: Source ACK#...............: 0x%08x", strbuf, rx_info.tcp_ack_num);
         if (relative)
         {
             VPrint(" (%4d relative)", rx_info.tcp_ack_num - init_ack);
         }
         VPrint("\n");
 
-        VPrint("Node%d: Source Window Size........: %d\n",     nodenum, rx_info.tcp_win_size);
-        VPrint("Node%d: Payload Length............: %d\n",     nodenum, rx_info.rx_len);
-        VPrint("Node%d: Flags.....................:", nodenum);
+        VPrint("%s: Source Window Size........: %d\n",     strbuf, rx_info.tcp_win_size);
+        VPrint("%s: Payload Length............: %d\n",     strbuf, rx_info.rx_len);
+        VPrint("%s: Flags.....................:",          strbuf);
 
         for (int idx = 0; idx < 9; idx++)
         {
@@ -89,6 +99,10 @@ public:
 
         VPrint("\n\n");
     }
+private:
+
+    char strbuf[1024];
+
 };
 
 #endif

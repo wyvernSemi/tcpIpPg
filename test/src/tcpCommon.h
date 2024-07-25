@@ -32,8 +32,8 @@
 
 #define TCP_PORT_NUM         0x0400
 
-#define CLIENT_TCP_INIT_SEQ  99
-#define SERVER_TCP_INIT_SEQ  123
+#define CLIENT_TCP_INIT_SEQ  0x0c3
+#define SERVER_TCP_INIT_SEQ  0x2ff
 
 #define PKTBUFSIZE           ( 2*1024)
 #define DEFAULTWINSIZE       (32*1024)

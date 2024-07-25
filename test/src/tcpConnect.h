@@ -40,8 +40,6 @@ public:
     // Constructor
     tcpConnect()
     {
-        last_dst_seq = 0;
-        payloadLen   = 0;
     };
 
     // Method for initiating connection with a server
@@ -54,7 +52,7 @@ public:
                                       uint64_t                       mac_dst_addr,
                                       uint32_t                       init_seq_num = 0);
 
-    // Method for a server to listen for connection request and process conection protocol 
+    // Method for a server to listen for connection request and process conection protocol
     tcpIpPg::rxInfo_t listenConnect  (int                            node,
                                       tcpIpPg*                       &pTcp,
                                       std::vector<tcpIpPg::rxInfo_t> &rxQueue,
@@ -85,14 +83,11 @@ public:
                                       bool                           processPkts  = false);
 
 private:
-    // Local scratch variables
-    uint32_t last_dst_seq;
-    uint32_t payloadLen;
 
     // Packet/data buffers
     uint32_t frmBuf  [PKTBUFSIZE];
     uint32_t payload [PKTBUFSIZE];
-    
+
     // Packet configuration structure, for use with tcpIpPg class methods
     tcpIpPg::tcpConfig_t pktCfg;
 };
