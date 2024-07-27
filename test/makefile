@@ -27,21 +27,11 @@
 
 # Target HDL: VERILOG | VHDL (default VERILOG)
 HDL                = VERILOG
+ARCHFLAG           = -m64
 
 #------------------------------------------------------
 # Internal variables
 #------------------------------------------------------
-
-# Get the help message from the simulator, filtered on Questa
-SIMTYPE            = $(shell vsim -help | grep -i questa)
-
-# If the SIMTYPE string is not empty, then this is Questa and a 64-bit compile,
-# else assume it's ModelSim and do a 32-bit compile.
-ifneq ("$(SIMTYPE)", "")
-  ARCHFLAG         = -m64
-else
-  ARCHFLAG         = -m32
-endif
 
 # User files to build, passed into vproc makefile build
 USERCODE           = VUserMain0.cpp \
@@ -85,13 +75,13 @@ endif
 # Specify the VProc makefile and .do files to use with simulator
 # based on whether VHDL has been specified (or the default VERILOG)
 ifeq ("$(HDL)", "VHDL")
-  MAKEFILEARG      = -f makefile.vhd
+  MAKEFILEARG      = HDL=VHDL
   SIMDO            = sim_vhdl.do
   SIMGDO           = simg_vhdl.do
   SIMLOGDO         = simlog_vhdl.do
   COMPDO           = compile_vhdl.do
 else
-  MAKEFILEARG      =
+  MAKEFILEARG      = HDL=VERILOG
   SIMDO            = sim.do
   SIMGDO           = simg.do
   SIMLOGDO         = simlog.do
