@@ -1,0 +1,142 @@
+###################################################################
+# Makefile for TCP/IPv4 packet generator (tcp_ip_pg) test bench
+# for GHDL
+#
+# Copyright (c) 2024 Simon Southwell.
+#
+# This file is part of tcpIpPg.
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# The file is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this file. If not, see <http://www.gnu.org/licenses/>.
+#
+###################################################################
+
+#------------------------------------------------------
+# User overridable definitions
+#------------------------------------------------------
+
+#------------------------------------------------------
+# Internal variables
+#------------------------------------------------------
+
+#------------------------------------------------------
+# Variable for software compilation
+VPROC              = VProc.so
+VLIB               = $(CURDIR)/$(VPROC)
+
+# User files to build, passed into vproc makefile build
+USERCODE           = VUserMain0.cpp \
+                     VUserMain1.cpp \
+                     tcpTest0.cpp   \
+                     tcpTest1.cpp   \
+                     tcpConnect.cpp
+
+TCPCODE            = tcpIpPg.cpp
+
+# VProc location, relative to this directory
+VPROC_TOP          = ../../vproc
+
+# Define the github repository URL for the VProc virtual processor
+VPROC_REPO         = https://github.com/wyvernSemi/vproc.git
+
+USRCFLAGS          = "-I$(CURDIR)/../src"
+
+# Set up Variables for tools
+MAKE_EXE           = make
+
+#------------------------------------------------------
+# Variables specific to target simulator
+#
+
+WAVEFILE          = waves.ghw
+WAVESAVEFILE      = $(WAVEFILE:%.ghw=%.gtkw)
+WORKDIR           = work
+
+SIMEXE             = ghdl
+SIMTOP             = tb
+
+# Flags for GHDL
+SIMFLAGS           = --std=08 --workdir=$(WORKDIR)
+
+VHDLFILELIST      = files_ghdl.tcl
+VHDLFILES         =$(foreach vhdlfile, $(file < $(VHDLFILELIST)), $(vhdlfile))
+
+#------------------------------------------------------
+# BUILD RULES
+#------------------------------------------------------
+
+# Build is dependant on processing makefile in vproc and riscV/iss
+all: vhdl
+
+# Call the vproc make file for it to determine if anything
+# needs building.
+.PHONY : vproc
+vproc: $(VPROC_TOP)
+	@$(MAKE_EXE) --no-print-directory           \
+                 -f makefile.ghdl               \
+                 $(MAKEFILEARG)                 \
+                 $(VLIB)                        \
+                 -C $(VPROC_TOP)/test           \
+                 USRFLAGS=$(USRCFLAGS)          \
+                 USRCDIR=$(CURDIR)/src          \
+                 USER_C="$(USERCODE)"           \
+                 MEM_C="$(TCPCODE)"             \
+                 MEMMODELDIR="$(CURDIR)/../src" \
+                 TESTDIR=$(CURDIR)
+
+#
+# Checkout VProc from github if it doesn't exist at the specified location
+#
+${VPROC_TOP}:
+	git clone $(VPROC_REPO) $(VPROC_TOP) --recursive
+
+${WORKDIR}:
+	@mkdir $(WORKDIR)
+
+# Analyse the VHDL files
+.PHONY: vhdl
+vhdl: vproc $(WORKDIR)
+	@$(SIMEXE) -a --std=08 --workdir=$(WORKDIR) $(VHDLFILES)
+
+#------------------------------------------------------
+# EXECUTION RULES
+#------------------------------------------------------
+
+run: all
+	@$(SIMEXE) --elab-run $(SIMFLAGS) $(SIMTOP)
+
+rungui: all
+	@$(SIMEXE) --elab-run $(SIMFLAGS) $(SIMTOP) --wave=$(WAVEFILE)
+	@if [ -e $(WAVESAVEFILE) ]; then                       \
+	    gtkwave -A $(WAVEFILE);                            \
+	else                                                   \
+	    gtkwave $(WAVEFILE);                               \
+	fi
+
+gui: rungui
+
+.SILENT:
+help:
+	@$(info make help          Display this message)
+	@$(info make               Build C/C++ and HDL code without running simulation)
+	@$(info make run           Build and run batch simulation)
+	@$(info make rungui/gui    Build and run GUI simulation (sim not started))
+	@$(info make clean         clean previous build artefacts)
+
+#------------------------------------------------------
+# CLEANING RULES
+#------------------------------------------------------
+
+clean: $(VPROC_TOP)
+	@$(MAKE_EXE) --no-print-directory -f makefile.nvc -C $(VPROC_TOP)/test USER_C="$(USERCODE)" TESTDIR="$(CURDIR)" clean
+	@rm -rf $(VLIB) $(VOBJDIR) *.o *.exe $(SIMTOP) $(WAVEFILE) work

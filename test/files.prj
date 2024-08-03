@@ -1,0 +1,3 @@
+sv      work ../../vproc/f_VProc.sv
+verilog work ../verilog/tcp_ip_pg.v
+verilog work tb.v

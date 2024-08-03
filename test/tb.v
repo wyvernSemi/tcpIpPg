@@ -46,12 +46,37 @@ localparam  TIMEOUT_COUNT    = 400000;
 reg            clk;
 integer        count;
 
+wire  [1:0]    halt;
+
 wire [63:0]    txd;
 wire  [7:0]    txc;
 wire [63:0]    rxd;
 wire  [7:0]    rxc;
 
-wire  [1:0]    halt;
+`ifdef VERILATOR
+// This nastiness is needed for Verilator to ensure correct registration of inputs
+// using delta cycle reads in VProc.
+reg  [63:0]    txd_dly;
+reg   [7:0]    txc_dly;
+reg  [63:0]    rxd_dly;
+reg   [7:0]    rxc_dly;
+
+// Delay by half a cycle
+always @(negedge clk)
+begin
+    txd_dly  <= txd;
+    txc_dly  <= txc;
+    rxd_dly  <= rxd;
+    rxc_dly  <= rxc;
+end
+`else
+// For normal event based simulators, patch signals straight through
+// without any delays
+wire [63:0]    txd_dly = txd;
+wire  [7:0]    txc_dly = txc;
+wire [63:0]    rxd_dly = rxd;
+wire  [7:0]    rxc_dly = rxc;
+`endif
 
 // -----------------------------------------------
 // Initialisation, clock and reset
@@ -67,9 +92,11 @@ begin
    
    clk                                 = 1'b1;
    count                               = -1;
-   
+
+`ifndef VERILATOR
    #0 // Ensure first x->1 clock edge is complete before initialisation
-   
+`endif
+
    if (DEBUG_STOP != 0)
    begin
      $display("\n***********************************************");
@@ -114,8 +141,8 @@ end
     .txd                     (txd),
     .txc                     (txc),
 
-    .rxd                     (rxd),
-    .rxc                     (rxc),
+    .rxd                     (rxd_dly),
+    .rxc                     (rxc_dly),
 
     .halt                    (halt[0])
   );
@@ -130,8 +157,8 @@ end
     .txd                     (rxd),
     .txc                     (rxc),
 
-    .rxd                     (txd),
-    .rxc                     (txc),
+    .rxd                     (txd_dly),
+    .rxc                     (txc_dly),
 
     .halt                    (halt[1])
   );
