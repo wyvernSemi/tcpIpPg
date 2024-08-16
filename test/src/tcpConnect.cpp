@@ -419,7 +419,7 @@ int tcpConnect::initiateTermination(
                             sbuf[idx] = pkt.rx_payload[idx];
                         }
                         sbuf[pkt.rx_len] = 0;
-                        VPrint("node%d: %s", node, sbuf);
+                        VPrint("Node%d: %s", node, sbuf);
                     }
 
                     // Send ACK

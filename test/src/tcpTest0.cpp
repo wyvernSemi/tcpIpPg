@@ -35,10 +35,15 @@ uint32_t tcpTest0::runTest()
     uint32_t payloadLen;
     uint32_t payload [PKTBUFSIZE];
     uint32_t frmBuf  [PKTBUFSIZE];
+    char     vstr    [12];
     tcpIpPg::tcpConfig_t pktCfg;
 
     // Create a tcpIpPg object
     pTcp = new tcpIpPg(node, CLIENT_IPV4_ADDR, CLIENT_MAC_ADDR, TCP_PORT_NUM);
+    
+    pTcp->getVersionString(vstr);
+    
+    VPrint("\ntcpIpPg version %s\n\n", vstr);
 
     // Let the simulation run for a few ticks
     pTcp->TcpVpSendIdle(SMALL_PAUSE);
@@ -111,7 +116,7 @@ uint32_t tcpTest0::runTest()
 
         pTcp->TcpVpSendIdle(SMALL_PAUSE);
 
-        printf("Terminating\n");
+        VPrint("Node%d: initiating termination\n\n", node);
 
         int error = conn.initiateTermination(
                                node, pTcp,
