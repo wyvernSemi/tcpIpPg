@@ -40,7 +40,7 @@ public:
     // Version
     static const uint32_t major_version        = 1;
     static const uint32_t minor_version        = 1;
-    static const uint32_t sub_version          = 0;
+    static const uint32_t patch_version        = 1;
     
     // CRC32 parameters
     static const uint32_t POLY                 = 0xEDB88320;  /* 0x04C11DB7 bit reversed */
@@ -142,6 +142,9 @@ public:
 
     // Method to generate a TCP/IPv4 packet
     uint32_t       genTcpIpPkt         (tcpConfig_t &cfg, uint32_t* frm_buf, uint32_t* payload, uint32_t payload_len);
+    
+    void           getVersionString    (char* version_str, uint32_t maxlen = 12) {
+                                            snprintf(version_str, maxlen, "%d.%d.%d", major_version, minor_version, patch_version);} 
 
 private:
 
