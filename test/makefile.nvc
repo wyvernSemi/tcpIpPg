@@ -42,6 +42,9 @@ USERCODE           = VUserMain0.cpp \
                      tcpConnect.cpp
 
 TCPCODE            = tcpIpPg.cpp
+TCPCDIR            = $(CURDIR)../src
+
+ALLSRC             = $(USERCODE:%.cpp=$(USRCDIR)/%.cpp) $(TCPCODE:%.cpp=$(TCPDOR)/%.cpp) $(TCPCDIR)/*.h
 
 # VProc location, relative to this directory
 VPROC_TOP          = ../../vproc
@@ -74,13 +77,14 @@ SIMFLAGS           = --ieee-warnings=off                    \
 # BUILD RULES
 #------------------------------------------------------
 
+.PHONY : all, vproc, vhdl, run, rungui, gui, help, clean
+
 # Build is dependant on processing makefile in vproc and riscV/iss
 all: vhdl
 
 # Call the vproc make file for it to determine if anything
 # needs building.
-.PHONY : vproc
-vproc: $(VPROC_TOP)
+vproc: $(VPROC_TOP) $(ALLSRC)
 	@$(MAKE_EXE) --no-print-directory           \
                  -f makefile.nvc                \
                  $(MAKEFILEARG)                 \
@@ -96,11 +100,10 @@ vproc: $(VPROC_TOP)
 #
 # Checkout VProc from github if it doesn't exist at the specified location
 #
-${VPROC_TOP}:
+$(VPROC_TOP):
 	git clone $(VPROC_REPO) $(VPROC_TOP) --recursive
 
 # Analyse HDL files
-.PHONY: vhdl
 vhdl: vproc
 	@$(SIMEXE) --std=08 -a -f files_nvc.tcl -e $(SIMTOP)
 
@@ -121,7 +124,6 @@ rungui: all
 
 gui: rungui
 
-.SILENT:
 help:
 	@$(info make help          Display this message)
 	@$(info make               Build C/C++ and HDL code without running simulation)
