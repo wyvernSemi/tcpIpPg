@@ -5,7 +5,7 @@ do cleanvlib.do
 do compile_vhdl.do
 
 # Run the tests. 
-vsim -quiet -pli VProc.so -t 100ps tb
+vsim -quiet -t 100ps tb
 set StdArithNoWarnings   1
 set NumericStdNoWarnings 1
 run -all
