@@ -1,5 +1,5 @@
 # tcpIpPg
-## 10GbE XGMII TCP/IPv4 packet generator for Verilog
+## 10GbE XGMII TCP/IPv4 packet generator for Verilog and VHDL
 
 The tcpIpPg project is a set of verification IP for generating and receiving 10GbE TCP/IPv4 Ethernet packets over an XGMII interface in a Verilog test environment. The generation environment is a set of C++ classes, to generate packets in to a buffer and then send that buffer over the Verilog XGMII interface. The connection between the Verilog and the C++ domain is done using the Virtual Processor, VProc (wyvernSemi/vproc)—a piece of VIP that allows C and C++ code, compiled for the local machine, to run and access the Verilog simulation environment, and VProc is freely available on github.
 
@@ -15,7 +15,7 @@ An example test environment is provided, for ModelSim, with two packet generator
 
 The basic functionality provided is as listed below
 
-* A Verilog module tcp_ip_pg
+* A Verilog module or VHDL component, `tcp_ip_pg`
     *	Clock input, nominally 156.25MHz (10×10<sup>9</sup> ÷ 64)
     *	XGMII interface, with TX and RX data and control  ports
     *	A halt output for use in test bench control
