@@ -41,10 +41,12 @@ USERCODE           = VUserMain0.cpp \
                      tcpTest1.cpp   \
                      tcpConnect.cpp
 
-TCPCODE            = tcpIpPg.cpp
-TCPCDIR            = $(CURDIR)../src
+USRCDIR            = $(CURDIR)/src
 
-ALLSRC             = $(USERCODE:%.cpp=$(USRCDIR)/%.cpp) $(TCPCODE:%.cpp=$(TCPDOR)/%.cpp) $(TCPCDIR)/*.h
+TCPCODE            = tcpIpPg.cpp
+TCPCDIR            = $(CURDIR)/../src
+
+ALLSRC             = $(USERCODE:%.cpp=$(USRCDIR)/%.cpp) $(TCPCODE:%.cpp=$(TCPCDIR)/%.cpp) $(TCPCDIR)/*.h
 
 # VProc location, relative to this directory
 VPROC_TOP          = ../../vproc
