@@ -302,8 +302,8 @@ uint32_t tcpIpPg::ethFrame(uint32_t* frame, uint32_t* payload, uint32_t payload_
     // Add a start-of-frame token
     frame[fidx++]                      = SOF;
 
-    // Add 6 bytes of preamble
-    for (int idx = 0; idx < 6; idx++)
+    // Add 7 bytes of preamble
+    for (int idx = 0; idx < ETH_PREAMBLE-2; idx++)
     {
         frame[fidx++]                  = PREAMBLE;
     }
@@ -343,7 +343,7 @@ uint32_t tcpIpPg::ethFrame(uint32_t* frame, uint32_t* payload, uint32_t payload_
     }
 
     // Calculate the CRC (excluding SOF, SFD and preamble)
-    uint32_t crc = crc32(&frame[8], fidx-8);
+    uint32_t crc = crc32(&frame[ETH_PREAMBLE], fidx-ETH_PREAMBLE);
 
     // Add crc
     for (int idx = 0; idx < 4; idx++)

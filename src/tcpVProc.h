@@ -65,7 +65,7 @@ public:
 
     // Ethernet parameters and header dimensions
     static const uint32_t ETH_MTU              = 1500;
-    static const uint32_t ETH_PREAMBLE         = 8;  // BYTES
+    static const uint32_t ETH_PREAMBLE         = 9;  // BYTES
     static const uint32_t ETH_802_1Q_LEN       = 4;  // BYTES
     static const uint32_t ETH_CRC_LEN          = 4;  // BYTES
     static const uint32_t ETH_HDR_LEN          = 14; // BYTES
@@ -216,7 +216,7 @@ private:
                         receiving_frame = false;
 
                         // Process input, subtracting the preamble
-                        processFrame(&rx_buf[8], rx_idx-8);
+                        processFrame(&rx_buf[ETH_PREAMBLE], rx_idx-ETH_PREAMBLE);
                     }
                     // Whilst receiving a frame, place it in the receive buffer
                     else
